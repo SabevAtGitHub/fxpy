@@ -1,9 +1,16 @@
 import sys, os
+
+from typing import Any, List, Tuple, TypeVar, Union, Optional
+
 import numpy as np
 import pandas as pd
 
+DF = TypeVar('DF', bound=pd.DataFrame)
+SER = TypeVar('SER', bound=pd.Series)
 
-def ordinal_str(n):
+
+
+def ordinal_str(n: int) -> str:
     '''Returns the ordinal number of a given integer, as a string.
         eg 1 -> 1st, 2 -> 2nd, 3 -> 3rd, etc.
     '''
@@ -23,7 +30,7 @@ def free_filename(fullname: str) -> str:
     return fullname
 
 
-def normalize_filename(filename: str, replace_with=''):
+def normalize_filename(filename: str, replace_with: str = '') -> str:
     invalid = '/\\:*?"><"|'
     if replace_with and replace_with in invalid:
         replace_with = '_'
@@ -34,22 +41,22 @@ def normalize_filename(filename: str, replace_with=''):
     return filename
 
 
-def round_half_up(n, decimals=0):
+def round_half_up(n, decimals: int = 0) -> Any:
     multiplier = 10 ** decimals
     return np.floor(n*multiplier + 0.5) / multiplier
 
 
-def is_iterable(obj):
+def is_iterable(obj: Any) -> bool:
     return (hasattr(obj, '__getitem__')
         or hasattr(obj, '__iter__'))
 
 
-def is_sequence(obj):
+def is_sequence(obj: Any) -> bool:
     return (not isinstance(obj, str)
         and is_iterable(obj))
 
 
-def as_sequence(obj, convert_dtype=list):
+def as_sequence(obj: Any, convert_dtype=list) -> Any:
     if is_sequence(obj):
         return obj
 
@@ -66,7 +73,7 @@ def _validate_column(column):
         raise TypeError('`column` must be `str`')
 
 
-def mask(obj: pd.DataFrame or pd.Series, values, column=None) -> pd.Series:
+def mask(obj: Union[SER, DF], values, column=None) -> pd.Series:
     if obj is None:
         raise ValueError('`obj` is None')
     if values is None:
@@ -83,32 +90,32 @@ def mask(obj: pd.DataFrame or pd.Series, values, column=None) -> pd.Series:
         raise TypeError('`obj` is not instance of Series or DataFrame')
 
 
-def invmask(obj: pd.DataFrame or pd.Series, values, column=None) -> pd.Series:
+def invmask(obj: Union[SER, DF], values, column=None) -> pd.Series:
     return ~mask(obj, values, column)
 
 
-def ntrues(obj: pd.DataFrame or pd.Series, values, column=None) -> int:
+def ntrues(obj: Union[SER, DF], values, column=None) -> int:
     return mask(obj, values, column).sum()
 
 
-def nnot_trues(obj: pd.DataFrame or pd.Series, values, column=None) -> int:
+def nnot_trues(obj: Union[SER, DF], values, column=None) -> int:
     return (~mask(obj, values, column)).sum()
 
 
-def mask_loc(obj: pd.DataFrame or pd.Series, values, column=None):
+def loc(obj: Union[SER, DF], values, column=None) -> Union[SER, DF]:
     return obj.loc[mask(obj, values, column)]
 
 
-def mask_invloc(obj: pd.DataFrame or pd.Series, values, column=None):
+def invloc(obj: Union[SER, DF], values, column=None) -> Union[SER, DF]:
     return obj.loc[~mask(obj, values, column)]
 
 
-def split_loc(obj: pd.DataFrame or pd.Series, values, column=None) -> tuple:
+def split_loc(obj: Union[SER, DF], values, column=None) -> Tuple[Union[SER, DF], Union[SER, DF]]:
     obj_mask = mask(obj, values, column)
     return obj.loc[obj_mask], obj.loc[~obj_mask]
 
 
-def nulls_mask(obj:pd.DataFrame or pd.Series, column=None) -> pd.Series:
+def nulls_mask(obj:Union[SER, DF], column=None) -> SER:
     if obj is None:
         raise ValueError('`obj` is None')
 
@@ -121,28 +128,28 @@ def nulls_mask(obj:pd.DataFrame or pd.Series, column=None) -> pd.Series:
         raise TypeError('`obj` is not instance of Series or DataFrame')
 
 
-def not_nulls_mask(obj:pd.DataFrame or pd.Series, column=None) -> pd.Series:
+def not_nulls_mask(obj:Union[SER, DF], column=None) -> SER:
     return ~nulls_mask(obj, column)
 
 
-def nulls_loc(obj: pd.DataFrame or pd.Series, values, column=None) -> tuple:
+def nulls_loc(obj: Union[SER, DF], values, column=None) -> Union[SER, DF]:
     return obj.loc[nulls_mask(obj, column)]
 
 
-def not_nulls_loc(obj: pd.DataFrame or pd.Series, values, column=None) -> tuple:
+def not_nulls_loc(obj: Union[SER, DF], values, column=None) -> Union[SER, DF]:
     return obj.loc[~nulls_mask(obj, column)]
 
 
-def nulls_split(obj: pd.DataFrame or pd.Series, column=None) -> tuple:
+def nulls_split(obj: Union[SER, DF], column=None) -> Tuple[Union[SER, DF], Union[SER, DF]]:
     obj_mask = nulls_mask(obj, column)
     return obj.loc[~obj_mask], obj.loc[obj_mask]
 
 
-def nnulls(obj: pd.DataFrame or pd.Series, column=None) -> int:
+def count_nulls(obj: Union[SER, DF], column=None) -> int:
     return nulls_mask(obj, column).sum()
 
 
-def nnot_nulls(obj: pd.DataFrame or pd.Series, column=None) -> int:
+def count_not_nulls(obj: Union[SER, DF], column=None) -> int:
     return (~nulls_mask(obj, column)).sum()
 
 
@@ -164,7 +171,7 @@ def _parse_input(**kwargs):
     return kwargs
 
 
-def intersection(first, second, column=None, keepna=False) -> np.ndarray:
+def intersection(first: Union[SER, DF], second: Union[SER, DF], column=None, keepna=False) -> np.ndarray:
     if first is None and second is None:
         return None
 
@@ -182,7 +189,8 @@ def intersection(first, second, column=None, keepna=False) -> np.ndarray:
         return first[first.isin(second)].unique()
 
 
-def setdiff(first, second, column=None, keepna=False, assume_unique=False) -> np.ndarray:
+def setdiff(first: Union[SER, DF], second: Union[SER, DF], 
+        column=None, keepna=False, assume_unique=False) -> np.ndarray:
     kwargs = _parse_input(first=first, second=second,
         column=column, keepna=keepna)
 
@@ -200,25 +208,25 @@ def setdiff(first, second, column=None, keepna=False, assume_unique=False) -> np
         return np.setdiff1d(first, second, assume_unique=True)
 
 
-def to_mixed_intstr(s: pd.Series) -> pd.Series:
+def to_mixed_intstr(s: SER) -> SER:
     res = s.copy()
     tmp = pd.to_numeric(s, errors='coerce')
     res.loc[tmp.notnull()] = tmp.loc[tmp.notnull()].apply(int).apply(str)
     return res
 
 
-def to_coerced_intstr(s: pd.Series) -> pd.Series:
+def to_coerced_intstr(s: SER) -> SER:
     res = pd.to_numeric(s, errors='coerce')
     res.loc[res.notnull()] = res.loc[res.notnull()].apply(int).apply(str)
     return res
 
 
-def to_intstr(s: pd.Series) -> pd.Series:
+def to_intstr(s: SER) -> SER:
     return s.apply(float).apply(int).apply(str)
 
 
 
-def sort_mix_values(s: pd.Series, ascending=True, str_position='first', na_position='last') -> pd.Series:
+def sort_mix_values(s: SER, ascending=True, str_position='first', na_position='last') -> SER:
     """
     Sort by the values, where 'str' and 'numeric' values are sorted separately.
 
@@ -235,14 +243,14 @@ def sort_mix_values(s: pd.Series, ascending=True, str_position='first', na_posit
         raise ValueError('`s` is None')
 
     # split null values, if any
-    num_nulls = nnulls(s)
+    num_nulls = count_nulls(s)
     if num_nulls:
         s, nulls = nulls_split(s)
 
     numeric = pd.to_numeric(s, errors='coerce')
 
     # split str values if any
-    num_strings = nnulls(numeric)
+    num_strings = count_nulls(numeric)
     if num_strings:
         numeric, str_ndx = nulls_split(numeric)
         strings = s[str_ndx.index]
