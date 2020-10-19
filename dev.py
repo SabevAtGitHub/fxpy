@@ -1,7 +1,6 @@
 #In[0]
 import os
 import sys
-import fx
+from fx import fx
 
 #In[0]
-fx.fx.
