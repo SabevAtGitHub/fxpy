@@ -1,3 +1,4 @@
+# pylint: disable=W,C,R
 #In[0]
 import sys, os
 import numpy as np 
@@ -16,7 +17,7 @@ df.iloc[0, 1] = 'c'
 df.iloc[2, 1] = np.nan
 df.iloc[3, 1] = 'a'
 s = df['area']
-s
+df
 #In[0]
 fx.sort_mix_values(s)
 
