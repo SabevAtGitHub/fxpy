@@ -17,8 +17,8 @@ def ordinal_str(n: int) -> str:
     if 10 <= n % 100 < 20:
         return '{0}th'.format(n)
     else:
-        ord = {1 : 'st', 2 : 'nd', 3 : 'rd'}.get(n % 10, 'th')
-        return '{0}{1}'.format(n, ord)
+        ordinal = {1 : 'st', 2 : 'nd', 3 : 'rd'}.get(n % 10, 'th')
+        return '{0}{1}'.format(n, ordinal)
 
 
 def free_filename(fullname: str) -> str:
@@ -272,3 +272,6 @@ def sort_mix_values(s: SER, ascending=True, str_position='first', na_position='l
             
     return result
 
+
+def update_on(first, second, on):
+    return first

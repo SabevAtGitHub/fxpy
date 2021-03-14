@@ -1,6 +1,9 @@
 #In[0]
 import os
 import sys
-from fx import fx
+import fx
 
 #In[0]
+help(ord)
+#In[0]
+ord('c')
