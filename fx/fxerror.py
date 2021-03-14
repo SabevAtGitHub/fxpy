@@ -18,6 +18,7 @@ class ArgumentValidationError(ValueError):
     """
 
     def __init__(self, arg, fn_name, correct_type):
+        super().__init__()
         self.error = "Argument '{0}' passed to {1}() is not a {2}".format(
             arg, fn_name, correct_type)
 
@@ -31,6 +32,7 @@ class InvalidReturnTypeError(ValueError):
     """
 
     def __init__(self, return_type, fn_name, correct_type):
+        super().__init__()
         self.error = "Invalid return type {0} for '{1}()', expected {2}".format(
             return_type, fn_name, correct_type)
 
